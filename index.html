@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Finance Tracker</title>
+    <title>Personal Finance Tracker - Firebase</title>
     <style>
         * {
             margin: 0;
@@ -430,6 +430,74 @@
             font-weight: 600;
         }
 
+        .sync-status {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .sync-status.synced {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .sync-status.syncing {
+            background: rgba(251, 191, 36, 0.2);
+            color: #f59e0b;
+        }
+
+        .sync-status.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .auth-section {
+            padding: 24px;
+            text-align: center;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+
+        .spinner {
+            border: 3px solid #e5e7eb;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
             .overview-grid, .stats-grid {
                 grid-template-columns: 1fr;
@@ -461,6 +529,10 @@
             .item-amount {
                 margin-right: 0;
             }
+
+            .auth-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -469,9 +541,22 @@
         <div class="card">
             <div class="card-header">
                 <h1>💰 Finance Tracker</h1>
-                <p class="subtitle">Einfache Finanzverwaltung mit Budget-Reservierung</p>
+                <p class="subtitle">Cloud-basierte Finanzverwaltung mit Firebase</p>
                 
-                <div class="overview-grid">
+                <!-- Auth Status -->
+                <div id="user-info" class="user-info" style="display: none;">
+                    <div>
+                        <span id="user-name">Angemeldet als: </span>
+                    </div>
+                    <button class="button btn-outline" onclick="signOut()">Abmelden</button>
+                </div>
+
+                <!-- Sync Status -->
+                <div id="sync-status" class="sync-status" style="display: none;">
+                    <span id="sync-text">Synchronisiert</span>
+                </div>
+                
+                <div id="overview-grid" class="overview-grid" style="display: none;">
                     <div class="overview-item">
                         <div class="overview-label">Verfügbares Geld</div>
                         <div id="available-balance" class="overview-value neutral">0,00 €</div>
@@ -488,7 +573,33 @@
             </div>
         </div>
 
-        <div class="card">
+        <!-- Auth Section -->
+        <div id="auth-section" class="card">
+            <div class="auth-section">
+                <h2 style="border: none; padding: 0; text-align: center;">Anmelden für Cloud-Synchronisation</h2>
+                <p style="margin-bottom: 20px; color: #64748b;">
+                    Melden Sie sich an, um Ihre Finanzdaten sicher in der Cloud zu speichern und von allen Geräten darauf zuzugreifen.
+                </p>
+                <div class="auth-buttons">
+                    <button class="button btn-primary" onclick="signInWithGoogle()">Mit Google anmelden</button>
+                    <button class="button btn-outline" onclick="signInAnonymously()">Anonym fortfahren</button>
+                </div>
+                <p style="margin-top: 16px; font-size: 12px; color: #94a3b8;">
+                    Ihre Daten werden sicher verschlüsselt und nur Sie haben Zugriff darauf.
+                </p>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="card" style="display: none;">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Lade Daten...</p>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="main-app" class="card" style="display: none;">
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('dashboard')">Dashboard</button>
                 <button class="tab" onclick="switchTab('transactions')">Transaktionen</button>
@@ -649,7 +760,7 @@
         </div>
     </div>
 
-    <!-- Modal für Ziele -->
+    <!-- Modals -->
     <div id="goal-modal" class="modal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeGoalModal()">&times;</button>
@@ -665,7 +776,6 @@
         </div>
     </div>
 
-    <!-- Modal für Budget-Ausgaben -->
     <div id="budget-spend-modal" class="modal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeBudgetSpendModal()">&times;</button>
@@ -685,7 +795,38 @@
         </div>
     </div>
 
-    <script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Firebase Konfiguration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCDr9sMJ2Vu_a5gOeq1vIvHL6oBIlSVKu4",
+            authDomain: "financetracker-b5be5.firebaseapp.com",
+            projectId: "financetracker-b5be5",
+            storageBucket: "financetracker-b5be5.firebasestorage.app",
+            messagingSenderId: "1016522100604",
+            appId: "1:1016522100604:web:399865e8cb668d14e59ef9",
+            measurementId: "G-X4SSW4P8WY"
+        };
+
+        // Firebase imports
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { 
+            getAuth, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            signInAnonymously as firebaseSignInAnonymously,
+            signOut as firebaseSignOut,
+            onAuthStateChanged 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Initialize Firebase
+        let app, auth, db, currentUser = null;
         let financeData = {
             availableBalance: 0,
             transactions: [],
@@ -696,37 +837,233 @@
 
         let currentGoalId = null;
         let currentBudgetId = null;
+        let isOnline = navigator.onLine;
+        let syncInProgress = false;
 
-        // Daten laden beim Start
-        window.onload = function() {
-            loadFinanceData();
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            
+            // Auth state observer
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                handleAuthStateChange(user);
+            });
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+            // Falls Firebase nicht funktioniert, offline weiterarbeiten
+            initializeOfflineMode();
+        }
+
+        function initializeOfflineMode() {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            document.getElementById('overview-grid').style.display = 'grid';
+            loadLocalData();
             updateDashboard();
             updateAllLists();
             checkRecurringPayments();
         }
 
-        function loadFinanceData() {
+        // Authentication functions
+        window.signInWithGoogle = async function() {
+            if (!auth) {
+                alert('Firebase nicht verfügbar. App läuft im Offline-Modus.');
+                return;
+            }
+            
             try {
-                // Für Demo-Zwecke verwenden wir in-memory storage
-                // In einer echten App würde hier localStorage verwendet
-                if (typeof window.demoData === 'undefined') {
-                    window.demoData = financeData;
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error('Google sign-in error:', error);
+                alert('Anmeldung fehlgeschlagen: ' + error.message);
+            }
+        };
+
+        window.signInAnonymously = async function() {
+            if (!auth) {
+                alert('Firebase nicht verfügbar. App läuft im Offline-Modus.');
+                return;
+            }
+            
+            try {
+                await firebaseSignInAnonymously(auth);
+            } catch (error) {
+                console.error('Anonymous sign-in error:', error);
+                alert('Anonyme Anmeldung fehlgeschlagen: ' + error.message);
+            }
+        };
+
+        window.signOut = async function() {
+            if (!auth) return;
+            
+            try {
+                await firebaseSignOut(auth);
+            } catch (error) {
+                console.error('Sign-out error:', error);
+                alert('Abmeldung fehlgeschlagen: ' + error.message);
+            }
+        };
+
+        async function handleAuthStateChange(user) {
+            if (user) {
+                // User signed in
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('main-app').style.display = 'none';
+                
+                // Update user info
+                const userName = user.displayName || (user.isAnonymous ? 'Anonymer Nutzer' : user.email);
+                document.getElementById('user-name').textContent = 'Angemeldet als: ' + userName;
+                document.getElementById('user-info').style.display = 'flex';
+                document.getElementById('sync-status').style.display = 'block';
+                
+                // Load user data
+                await loadUserData(user.uid);
+                
+                // Show main app
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                document.getElementById('overview-grid').style.display = 'grid';
+                
+                updateDashboard();
+                updateAllLists();
+                checkRecurringPayments();
+                
+            } else {
+                // User signed out
+                document.getElementById('auth-section').style.display = 'block';
+                document.getElementById('main-app').style.display = 'none';
+                document.getElementById('user-info').style.display = 'none';
+                document.getElementById('sync-status').style.display = 'none';
+                document.getElementById('overview-grid').style.display = 'none';
+                
+                // Clear data
+                financeData = {
+                    availableBalance: 0,
+                    transactions: [],
+                    budgets: [],
+                    goals: [],
+                    recurring: []
+                };
+            }
+        }
+
+        async function loadUserData(userId) {
+            if (!db) {
+                loadLocalData();
+                return;
+            }
+            
+            try {
+                setSyncStatus('syncing', 'Lade Daten...');
+                
+                const userDocRef = doc(db, 'users', userId);
+                const userDoc = await getDoc(userDocRef);
+                
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    financeData = {
+                        availableBalance: userData.availableBalance || 0,
+                        transactions: userData.transactions || [],
+                        budgets: userData.budgets || [],
+                        goals: userData.goals || [],
+                        recurring: userData.recurring || []
+                    };
                 } else {
-                    financeData = window.demoData;
+                    // Initialize empty data for new user
+                    await saveUserData(userId);
                 }
-            } catch (e) {
-                console.error('Fehler beim Laden der Daten:', e);
+                
+                setSyncStatus('synced', 'Synchronisiert');
+                
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                setSyncStatus('error', 'Fehler beim Laden');
+                // Fallback to local data
+                loadLocalData();
+            }
+        }
+
+        async function saveUserData(userId) {
+            if (!db || !userId || syncInProgress) return;
+            
+            try {
+                syncInProgress = true;
+                setSyncStatus('syncing', 'Speichere...');
+                
+                const userDocRef = doc(db, 'users', userId);
+                await setDoc(userDocRef, {
+                    ...financeData,
+                    lastUpdated: new Date().toISOString()
+                });
+                
+                setSyncStatus('synced', 'Synchronisiert');
+                
+            } catch (error) {
+                console.error('Error saving user data:', error);
+                setSyncStatus('error', 'Speicher-Fehler');
+                // Fallback to local storage
+                saveLocalData();
+            } finally {
+                syncInProgress = false;
+            }
+        }
+
+        function setSyncStatus(status, text) {
+            const statusEl = document.getElementById('sync-status');
+            const textEl = document.getElementById('sync-text');
+            
+            if (statusEl && textEl) {
+                statusEl.className = 'sync-status ' + status;
+                textEl.textContent = text;
+            }
+        }
+
+        function loadLocalData() {
+            try {
+                const savedData = localStorage.getItem('financeTracker');
+                if (savedData) {
+                    financeData = JSON.parse(savedData);
+                }
+            } catch (error) {
+                console.error('Error loading local data:', error);
+            }
+        }
+
+        function saveLocalData() {
+            try {
+                localStorage.setItem('financeTracker', JSON.stringify(financeData));
+            } catch (error) {
+                console.error('Error saving local data:', error);
             }
         }
 
         function saveFinanceData() {
-            try {
-                window.demoData = financeData;
-            } catch (e) {
-                console.error('Fehler beim Speichern der Daten:', e);
+            if (currentUser) {
+                saveUserData(currentUser.uid);
+            } else {
+                saveLocalData();
             }
         }
 
+        // Online/Offline handling
+        window.addEventListener('online', () => {
+            isOnline = true;
+            if (currentUser) {
+                setSyncStatus('syncing', 'Synchronisiere...');
+                saveUserData(currentUser.uid);
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            setSyncStatus('error', 'Offline');
+        });
+
+        // Finance functions
         function updateDashboard() {
             const totalIncome = financeData.transactions
                 .filter(t => t.type === 'income')
@@ -739,9 +1076,7 @@
             const budgetTotal = financeData.budgets.reduce((sum, b) => sum + (b.amount - b.spent), 0);
             const goalsTotal = financeData.goals.reduce((sum, g) => sum + g.saved, 0);
             
-            // Verfügbares Geld = Einnahmen - Ausgaben - In Budgets - Für Ziele
             financeData.availableBalance = totalIncome - totalExpenses - budgetTotal - goalsTotal;
-            
             const netWorth = totalIncome - totalExpenses;
 
             // UI Updates
@@ -758,7 +1093,7 @@
         }
 
         // Quick Actions
-        function quickIncome() {
+        window.quickIncome = function() {
             const amount = parseFloat(document.getElementById('quick-amount').value);
             const description = document.getElementById('quick-description').value.trim();
             
@@ -777,9 +1112,9 @@
 
             document.getElementById('quick-amount').value = '';
             document.getElementById('quick-description').value = '';
-        }
+        };
 
-        function quickExpense() {
+        window.quickExpense = function() {
             const amount = parseFloat(document.getElementById('quick-amount').value);
             const description = document.getElementById('quick-description').value.trim();
             
@@ -788,7 +1123,6 @@
                 return;
             }
 
-            // Prüfen ob genug verfügbares Geld da ist
             if (amount > financeData.availableBalance) {
                 alert('Nicht genug verfügbares Geld! Aktuell verfügbar: ' + financeData.availableBalance.toFixed(2) + '€');
                 return;
@@ -804,10 +1138,10 @@
 
             document.getElementById('quick-amount').value = '';
             document.getElementById('quick-description').value = '';
-        }
+        };
 
-        // Transaktionen
-        function addTransaction() {
+        // Transactions
+        window.addTransaction = function() {
             const amount = parseFloat(document.getElementById('transaction-amount').value);
             const type = document.getElementById('transaction-type').value;
             const description = document.getElementById('transaction-description').value;
@@ -823,7 +1157,6 @@
                 return;
             }
 
-            // Bei Ausgaben prüfen ob genug verfügbares Geld da ist
             if (type === 'expense' && amount > financeData.availableBalance) {
                 alert('Nicht genug verfügbares Geld! Aktuell verfügbar: ' + financeData.availableBalance.toFixed(2) + '€');
                 return;
@@ -842,7 +1175,7 @@
 
             document.getElementById('transaction-amount').value = '';
             document.getElementById('transaction-description').value = '';
-        }
+        };
 
         function addTransactionData(transaction) {
             financeData.transactions.push(transaction);
@@ -851,17 +1184,17 @@
             updateAllLists();
         }
 
-        function deleteTransaction(transactionId) {
+        window.deleteTransaction = function(transactionId) {
             if (!confirm('Transaktion wirklich löschen?')) return;
 
             financeData.transactions = financeData.transactions.filter(t => t.id !== transactionId);
             saveFinanceData();
             updateDashboard();
             updateAllLists();
-        }
+        };
 
         // Budgets
-        function addBudget() {
+        window.addBudget = function() {
             const name = document.getElementById('budget-name').value.trim();
             const amount = parseFloat(document.getElementById('budget-amount').value);
 
@@ -875,7 +1208,6 @@
                 return;
             }
 
-            // Prüfen ob genug verfügbares Geld da ist
             if (amount > financeData.availableBalance) {
                 alert('Nicht genug verfügbares Geld! Aktuell verfügbar: ' + financeData.availableBalance.toFixed(2) + '€');
                 return;
@@ -890,44 +1222,40 @@
             };
 
             financeData.budgets.push(budget);
-            
-            // Geld wird vom verfügbaren Betrag abgezogen (Reservierung)
-            // Das passiert automatisch in updateDashboard() durch die Berechnung
-            
             saveFinanceData();
             updateDashboard();
             updateAllLists();
 
             document.getElementById('budget-name').value = '';
             document.getElementById('budget-amount').value = '';
-        }
+        };
 
-        function deleteBudget(budgetId) {
+        window.deleteBudget = function(budgetId) {
             if (!confirm('Budget wirklich löschen? Das nicht ausgegebene Geld wird wieder verfügbar.')) return;
             
             financeData.budgets = financeData.budgets.filter(b => b.id !== budgetId);
             saveFinanceData();
             updateDashboard();
             updateAllLists();
-        }
+        };
 
-        function openBudgetSpendModal(budgetId) {
+        window.openBudgetSpendModal = function(budgetId) {
             const budget = financeData.budgets.find(b => b.id === budgetId);
             if (!budget) return;
 
             currentBudgetId = budgetId;
             document.getElementById('budget-spend-modal').style.display = 'block';
             document.getElementById('budget-spend-amount').focus();
-        }
+        };
 
-        function closeBudgetSpendModal() {
+        window.closeBudgetSpendModal = function() {
             document.getElementById('budget-spend-modal').style.display = 'none';
             document.getElementById('budget-spend-amount').value = '';
             document.getElementById('budget-spend-description').value = '';
             currentBudgetId = null;
-        }
+        };
 
-        function confirmBudgetSpend() {
+        window.confirmBudgetSpend = function() {
             const amount = parseFloat(document.getElementById('budget-spend-amount').value);
             const description = document.getElementById('budget-spend-description').value.trim();
             
@@ -952,7 +1280,6 @@
 
             budget.spent += amount;
             
-            // Transaktion hinzufügen
             addTransactionData({
                 amount: amount,
                 type: 'expense',
@@ -963,9 +1290,9 @@
             });
 
             closeBudgetSpendModal();
-        }
+        };
 
-        function addMoneyToBudget(budgetId) {
+        window.addMoneyToBudget = function(budgetId) {
             const amount = parseFloat(prompt('Wie viel Geld zum Budget hinzufügen? (€)'));
             if (!amount || amount <= 0) return;
 
@@ -981,9 +1308,9 @@
             saveFinanceData();
             updateDashboard();
             updateAllLists();
-        }
+        };
 
-        function removeMoneyFromBudget(budgetId) {
+        window.removeMoneyFromBudget = function(budgetId) {
             const budget = financeData.budgets.find(b => b.id === budgetId);
             if (!budget) return;
 
@@ -1003,10 +1330,10 @@
             saveFinanceData();
             updateDashboard();
             updateAllLists();
-        }
+        };
 
-        // Ziele
-        function addGoal() {
+        // Goals
+        window.addGoal = function() {
             const name = document.getElementById('goal-name').value.trim();
             const target = parseFloat(document.getElementById('goal-target').value);
 
@@ -1034,30 +1361,30 @@
 
             document.getElementById('goal-name').value = '';
             document.getElementById('goal-target').value = '';
-        }
+        };
 
-        function deleteGoal(goalId) {
+        window.deleteGoal = function(goalId) {
             if (!confirm('Sparziel wirklich löschen? Das gesparte Geld wird wieder verfügbar.')) return;
             
             financeData.goals = financeData.goals.filter(g => g.id !== goalId);
             saveFinanceData();
             updateDashboard();
             updateAllLists();
-        }
+        };
 
-        function openGoalModal(goalId) {
+        window.openGoalModal = function(goalId) {
             currentGoalId = goalId;
             document.getElementById('goal-modal').style.display = 'block';
             document.getElementById('goal-add-amount').focus();
-        }
+        };
 
-        function closeGoalModal() {
+        window.closeGoalModal = function() {
             document.getElementById('goal-modal').style.display = 'none';
             document.getElementById('goal-add-amount').value = '';
             currentGoalId = null;
-        }
+        };
 
-        function confirmAddToGoal() {
+        window.confirmAddToGoal = function() {
             const amount = parseFloat(document.getElementById('goal-add-amount').value);
             
             if (!amount || amount <= 0) {
@@ -1080,9 +1407,9 @@
             updateAllLists();
 
             closeGoalModal();
-        }
+        };
 
-        function withdrawFromGoal(goalId) {
+        window.withdrawFromGoal = function(goalId) {
             const goal = financeData.goals.find(g => g.id === goalId);
             if (!goal || goal.saved <= 0) {
                 alert('Kein Geld zum Abheben vorhanden!');
@@ -1099,7 +1426,6 @@
 
             goal.saved -= amount;
             
-            // Als Einnahme hinzufügen
             addTransactionData({
                 amount: amount,
                 type: 'income',
@@ -1107,10 +1433,10 @@
                 category: 'Sparen',
                 date: new Date().toISOString()
             });
-        }
+        };
 
-        // Fixkosten
-        function addRecurring() {
+        // Recurring payments
+        window.addRecurring = function() {
             const name = document.getElementById('recurring-name').value.trim();
             const amount = parseFloat(document.getElementById('recurring-amount').value);
             const day = parseInt(document.getElementById('recurring-day').value);
@@ -1148,15 +1474,15 @@
             document.getElementById('recurring-name').value = '';
             document.getElementById('recurring-amount').value = '';
             document.getElementById('recurring-day').value = '';
-        }
+        };
 
-        function deleteRecurring(recurringId) {
+        window.deleteRecurring = function(recurringId) {
             if (!confirm('Fixkosten wirklich löschen?')) return;
             
             financeData.recurring = financeData.recurring.filter(r => r.id !== recurringId);
             saveFinanceData();
             updateAllLists();
-        }
+        };
 
         function checkRecurringPayments() {
             const today = new Date();
@@ -1170,7 +1496,6 @@
                     (lastProcessed.getMonth() !== currentMonth || lastProcessed.getFullYear() !== currentYear);
 
                 if (shouldProcess && todayDay >= recurring.day) {
-                    // Automatisch als Ausgabe hinzufügen
                     addTransactionData({
                         amount: recurring.amount,
                         type: 'expense',
@@ -1186,7 +1511,7 @@
             });
         }
 
-        // UI Update Funktionen
+        // UI Update Functions
         function updateAllLists() {
             updateTransactionsList();
             updateBudgetsList();
@@ -1352,7 +1677,6 @@
             
             let nextDate = new Date(currentYear, currentMonth, recurring.day);
             
-            // Wenn der Tag bereits vorbei ist, nächsten Monat nehmen
             if (todayDay > recurring.day) {
                 nextDate = new Date(currentYear, currentMonth + 1, recurring.day);
             }
@@ -1361,38 +1685,38 @@
         }
 
         // Navigation
-        function switchTab(tabName) {
+        window.switchTab = function(tabName) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
             event.target.classList.add('active');
             document.getElementById(tabName).classList.add('active');
-        }
+        };
 
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            // Modal schließen beim Klick außerhalb
+ // Initialize app
+        window.onload = function() {
+            // Modal click handlers
             const modals = ['goal-modal', 'budget-spend-modal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (modal) {
                     modal.addEventListener('click', function(e) {
-                        if (e.target === this) {
+                        if (e.target === this) { // Nur wenn auf den Hintergrund geklickt wird
                             this.style.display = 'none';
                         }
                     });
                 }
             });
 
-            // Enter-Taste Support
+            // Enter key support
             const inputs = [
-                { id: 'quick-amount', action: quickIncome },
-                { id: 'transaction-amount', action: addTransaction },
-                { id: 'budget-amount', action: addBudget },
-                { id: 'goal-target', action: addGoal },
-                { id: 'recurring-amount', action: addRecurring },
-                { id: 'goal-add-amount', action: confirmAddToGoal },
-                { id: 'budget-spend-amount', action: confirmBudgetSpend }
+                { id: 'quick-amount', action: () => quickIncome() },
+                { id: 'transaction-amount', action: () => addTransaction() },
+                { id: 'budget-amount', action: () => addBudget() },
+                { id: 'goal-target', action: () => addGoal() },
+                { id: 'recurring-amount', action: () => addRecurring() },
+                { id: 'goal-add-amount', action: () => confirmAddToGoal() },
+                { id: 'budget-spend-amount', action: () => confirmBudgetSpend() }
             ];
 
             inputs.forEach(input => {
@@ -1406,9 +1730,10 @@
                 }
             });
 
-            // Fixkosten täglich prüfen
-            setInterval(checkRecurringPayments, 60000); // Jede Minute prüfen
-        });
+            // Check recurring payments periodically
+            setInterval(checkRecurringPayments, 60000);
+        };
+
     </script>
 </body>
 </html>
