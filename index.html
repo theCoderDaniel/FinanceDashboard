@@ -12,31 +12,34 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            background: #fafafa;
             min-height: 100vh;
             padding: 20px;
-            color: #1e293b;
-            line-height: 1.6;
+            color: #111827;
+            line-height: 1.5;
+            font-size: 14px;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
         .card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            border: 1px solid #f1f5f9;
             margin-bottom: 24px;
             overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         }
 
         .card-header {
             padding: 32px;
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            background: #111827;
             color: white;
+            border-bottom: 1px solid #e5e7eb;
         }
 
         .card-body {
@@ -46,91 +49,98 @@
         h1 {
             margin-bottom: 8px;
             font-size: 28px;
-            font-weight: 800;
+            font-weight: 700;
+            letter-spacing: -0.025em;
         }
 
         .subtitle {
             margin-bottom: 24px;
             font-size: 16px;
-            opacity: 0.9;
+            opacity: 0.8;
+            font-weight: 400;
         }
 
         h2 {
-            color: #1e293b;
+            color: #111827;
             margin-bottom: 20px;
-            font-size: 20px;
-            font-weight: 700;
-            border-left: 4px solid #3b82f6;
-            padding-left: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
         }
 
         .overview-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            gap: 16px;
             margin-bottom: 0;
         }
 
         .overview-item {
             text-align: center;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .overview-label {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
             margin-bottom: 8px;
             text-transform: uppercase;
-            font-weight: 600;
+            font-weight: 500;
+            letter-spacing: 0.05em;
         }
 
         .overview-value {
             font-size: 24px;
-            font-weight: 800;
+            font-weight: 700;
+            letter-spacing: -0.025em;
         }
 
         .positive { color: #10b981; }
         .negative { color: #ef4444; }
-        .neutral { color: #64748b; }
+        .neutral { color: #6b7280; }
 
         .tabs {
             display: flex;
-            background: #f1f5f9;
-            border-radius: 8px;
-            padding: 4px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 6px;
             margin-bottom: 0;
             overflow-x: auto;
+            border: 1px solid #f1f5f9;
         }
 
         .tab {
             flex: 1;
             min-width: 120px;
-            padding: 12px 16px;
+            padding: 12px 20px;
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            color: #64748b;
-            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #6b7280;
+            border-radius: 8px;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
         .tab.active {
-            color: white;
-            background: #3b82f6;
+            color: #111827;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .tab:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.8);
-            color: #475569;
+            background: rgba(255, 255, 255, 0.5);
+            color: #374151;
         }
 
         .tab-content {
             display: none;
-            padding: 24px;
+            padding: 32px;
         }
 
         .tab-content.active {
@@ -138,31 +148,33 @@
         }
 
         .input-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
+            margin-bottom: 8px;
+            font-weight: 500;
             color: #374151;
-            font-size: 14px;
+            font-size: 13px;
+            letter-spacing: -0.01em;
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e5e7eb;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
             border-radius: 8px;
             font-size: 14px;
             background: white;
             transition: all 0.2s ease;
+            font-family: inherit;
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #111827;
+            box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.05);
         }
 
         .button {
@@ -172,21 +184,23 @@
             padding: 12px 20px;
             border: none;
             border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             text-decoration: none;
             gap: 6px;
+            font-family: inherit;
+            letter-spacing: -0.01em;
         }
 
         .btn-primary {
-            background: #3b82f6;
+            background: #111827;
             color: white;
         }
 
         .btn-primary:hover {
-            background: #2563eb;
+            background: #000000;
         }
 
         .btn-success {
@@ -209,13 +223,13 @@
 
         .btn-outline {
             background: white;
-            color: #64748b;
-            border: 2px solid #e5e7eb;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
         }
 
         .btn-outline:hover {
-            border-color: #3b82f6;
-            color: #3b82f6;
+            border-color: #111827;
+            color: #111827;
         }
 
         .btn-small {
@@ -226,6 +240,7 @@
         .form-row {
             display: flex;
             gap: 16px;
+            align-items: end;
         }
 
         .form-row .input-group {
@@ -236,11 +251,17 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px;
-            border-radius: 8px;
+            padding: 20px;
+            border-radius: 12px;
             margin-bottom: 8px;
+            background: #fafafa;
+            border: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+        }
+
+        .list-item:hover {
             background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            border-color: #e5e7eb;
         }
 
         .item-info {
@@ -248,82 +269,86 @@
         }
 
         .item-title {
-            font-weight: 700;
-            color: #1e293b;
+            font-weight: 600;
+            color: #111827;
             margin-bottom: 4px;
-            font-size: 16px;
+            font-size: 15px;
+            letter-spacing: -0.01em;
         }
 
         .item-subtitle {
             font-size: 12px;
-            color: #64748b;
+            color: #6b7280;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .item-amount {
-            font-weight: 800;
+            font-weight: 700;
             font-size: 16px;
-            margin-right: 12px;
+            margin-right: 16px;
+            letter-spacing: -0.025em;
         }
 
         .item-actions {
             display: flex;
-            gap: 6px;
+            gap: 8px;
         }
 
         .empty-state {
             text-align: center;
-            color: #64748b;
-            padding: 40px 20px;
+            color: #9ca3af;
+            padding: 60px 20px;
             font-size: 14px;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 2px dashed #cbd5e1;
+            background: #fafafa;
+            border-radius: 12px;
+            border: 1px solid #f1f5f9;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 32px;
         }
 
         .stat-item {
             text-align: center;
-            padding: 20px;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            padding: 24px;
+            background: #fafafa;
+            border-radius: 12px;
+            border: 1px solid #f1f5f9;
         }
 
         .stat-value {
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 6px;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
         }
 
         .stat-label {
-            font-size: 12px;
-            color: #64748b;
+            font-size: 11px;
+            color: #9ca3af;
             text-transform: uppercase;
-            font-weight: 600;
+            font-weight: 500;
+            letter-spacing: 0.05em;
         }
 
         .progress-bar {
             width: 100%;
-            height: 8px;
-            background: #e5e7eb;
-            border-radius: 4px;
+            height: 6px;
+            background: #f1f5f9;
+            border-radius: 3px;
             overflow: hidden;
-            margin: 12px 0;
+            margin: 16px 0;
         }
 
         .progress-fill {
             height: 100%;
-            background: #10b981;
-            border-radius: 4px;
+            background: #111827;
+            border-radius: 3px;
             transition: width 0.3s ease;
         }
 
@@ -332,33 +357,31 @@
         }
 
         .budget-card, .goal-card {
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 24px;
             margin-bottom: 16px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #f1f5f9;
             background: white;
+            transition: all 0.2s ease;
         }
 
-        .budget-card {
-            border-left: 4px solid #3b82f6;
-        }
-
-        .goal-card {
-            border-left: 4px solid #10b981;
+        .budget-card:hover, .goal-card:hover {
+            border-color: #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         }
 
         .transaction-income {
-            border-left: 4px solid #10b981;
+            border-left: 3px solid #10b981;
         }
 
         .transaction-expense {
-            border-left: 4px solid #ef4444;
+            border-left: 3px solid #ef4444;
         }
 
         .edit-controls {
             display: flex;
             gap: 8px;
-            margin-top: 12px;
+            margin-top: 16px;
             flex-wrap: wrap;
         }
 
@@ -369,8 +392,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.4);
             z-index: 1000;
+            backdrop-filter: blur(4px);
         }
 
         .modal-content {
@@ -379,83 +403,90 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: white;
-            border-radius: 12px;
-            padding: 24px;
+            border-radius: 16px;
+            padding: 32px;
             max-width: 480px;
             width: 90%;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid #f1f5f9;
         }
 
         .modal h3 {
-            margin-bottom: 16px;
-            color: #1e293b;
+            margin-bottom: 20px;
+            color: #111827;
             font-size: 18px;
-            font-weight: 700;
+            font-weight: 600;
+            letter-spacing: -0.01em;
         }
 
         .close-modal {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            background: #f1f5f9;
+            top: 16px;
+            right: 16px;
+            background: none;
             border: none;
-            font-size: 20px;
+            font-size: 24px;
             cursor: pointer;
-            color: #64748b;
+            color: #9ca3af;
             width: 32px;
             height: 32px;
-            border-radius: 50%;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s ease;
         }
 
         .close-modal:hover {
-            background: #fee2e2;
-            color: #ef4444;
+            background: #f3f4f6;
+            color: #6b7280;
         }
 
         .date-info {
             font-size: 11px;
-            color: #94a3b8;
+            color: #9ca3af;
             margin-top: 4px;
         }
 
         .recurring-indicator {
             background: #fef3c7;
             color: #92400e;
-            padding: 2px 6px;
+            padding: 2px 8px;
             border-radius: 4px;
             font-size: 10px;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .sync-status {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            padding: 12px;
+            padding: 12px 16px;
             margin-bottom: 16px;
             text-align: center;
-            font-size: 14px;
+            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .sync-status.synced {
-            background: rgba(16, 185, 129, 0.2);
+            background: rgba(16, 185, 129, 0.15);
             color: #10b981;
+            border-color: rgba(16, 185, 129, 0.2);
         }
 
         .sync-status.syncing {
-            background: rgba(251, 191, 36, 0.2);
+            background: rgba(251, 191, 36, 0.15);
             color: #f59e0b;
+            border-color: rgba(251, 191, 36, 0.2);
         }
 
         .sync-status.error {
-            background: rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.15);
             color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.2);
         }
 
         .auth-section {
-            padding: 24px;
+            padding: 48px 32px;
             text-align: center;
         }
 
@@ -464,33 +495,34 @@
             gap: 12px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-top: 16px;
+            margin-top: 24px;
         }
 
         .user-info {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            padding: 12px;
+            padding: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .loading {
             text-align: center;
-            padding: 40px;
-            color: #64748b;
+            padding: 60px;
+            color: #9ca3af;
         }
 
         .spinner {
-            border: 3px solid #e5e7eb;
-            border-top: 3px solid #3b82f6;
+            border: 3px solid #f1f5f9;
+            border-top: 3px solid #111827;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
+            margin: 0 auto 20px;
         }
 
         @keyframes spin {
@@ -498,7 +530,18 @@
             100% { transform: rotate(360deg); }
         }
 
+        .info-text {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
         @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
             .overview-grid, .stats-grid {
                 grid-template-columns: 1fr;
             }
@@ -507,12 +550,8 @@
                 flex-direction: column;
             }
 
-            .container {
-                padding: 0 16px;
-            }
-
             .card-header, .card-body, .tab-content {
-                padding: 20px;
+                padding: 24px;
             }
 
             .item-actions {
@@ -530,9 +569,39 @@
                 margin-right: 0;
             }
 
-            .auth-buttons {
+            .auth-buttons, .edit-controls {
                 flex-direction: column;
             }
+
+            .auth-section {
+                padding: 32px 24px;
+            }
+
+            .modal-content {
+                padding: 24px;
+                width: 95%;
+            }
+        }
+
+        /* Additional clean styling improvements */
+        .transaction-income .item-amount {
+            color: #10b981;
+        }
+
+        .transaction-expense .item-amount {
+            color: #ef4444;
+        }
+
+        .budget-card {
+            border-left: 3px solid #111827;
+        }
+
+        .goal-card {
+            border-left: 3px solid #10b981;
+        }
+
+        .progress-fill.positive {
+            background: #10b981;
         }
     </style>
 </head>
@@ -576,15 +645,15 @@
         <!-- Auth Section -->
         <div id="auth-section" class="card">
             <div class="auth-section">
-                <h2 style="border: none; padding: 0; text-align: center;">Anmelden für Cloud-Synchronisation</h2>
-                <p style="margin-bottom: 20px; color: #64748b;">
+                <h2 style="border: none; padding: 0; text-align: center; margin-bottom: 12px;">Anmelden für Cloud-Synchronisation</h2>
+                <p class="info-text">
                     Melden Sie sich an, um Ihre Finanzdaten sicher in der Cloud zu speichern und von allen Geräten darauf zuzugreifen.
                 </p>
                 <div class="auth-buttons">
                     <button class="button btn-primary" onclick="signInWithGoogle()">Mit Google anmelden</button>
                     <button class="button btn-outline" onclick="signInAnonymously()">Anonym fortfahren</button>
                 </div>
-                <p style="margin-top: 16px; font-size: 12px; color: #94a3b8;">
+                <p style="margin-top: 20px; font-size: 11px; color: rgba(107, 114, 128, 0.8);">
                     Ihre Daten werden sicher verschlüsselt und nur Sie haben Zugriff darauf.
                 </p>
             </div>
@@ -681,7 +750,7 @@
 
             <div id="budgets" class="tab-content">
                 <h2>Neues Budget erstellen</h2>
-                <p style="margin-bottom: 16px; color: #64748b; font-size: 14px;">
+                <p class="info-text">
                     Beim Erstellen wird der Betrag von deinem verfügbaren Geld abgezogen und für das Budget reserviert.
                 </p>
                 <div class="form-row">
@@ -769,7 +838,7 @@
                 <label for="goal-add-amount">Betrag (€)</label>
                 <input type="number" id="goal-add-amount" step="0.01" min="0" placeholder="Betrag eingeben">
             </div>
-            <div style="display: flex; gap: 12px; margin-top: 16px;">
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
                 <button class="button btn-success" onclick="confirmAddToGoal()" style="flex: 1;">Hinzufügen</button>
                 <button class="button btn-outline" onclick="closeGoalModal()" style="flex: 1;">Abbrechen</button>
             </div>
@@ -788,7 +857,7 @@
                 <label for="budget-spend-description">Wofür?</label>
                 <input type="text" id="budget-spend-description" placeholder="Beschreibung">
             </div>
-            <div style="display: flex; gap: 12px; margin-top: 16px;">
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
                 <button class="button btn-success" onclick="confirmBudgetSpend()" style="flex: 1;">Ausgeben</button>
                 <button class="button btn-outline" onclick="closeBudgetSpendModal()" style="flex: 1;">Abbrechen</button>
             </div>
@@ -1619,7 +1688,7 @@
                             <div class="item-amount positive">${remaining.toFixed(2)}€ fehlen noch</div>
                         </div>
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${percentage}%"></div>
+                            <div class="progress-fill positive" style="width: ${percentage}%"></div>
                         </div>
                         <div class="edit-controls">
                             <button class="button btn-success btn-small" onclick="openGoalModal(${goal.id})">Geld hinzufügen</button>
@@ -1693,7 +1762,7 @@
             document.getElementById(tabName).classList.add('active');
         };
 
- // Initialize app
+        // Initialize app
         window.onload = function() {
             // Modal click handlers
             const modals = ['goal-modal', 'budget-spend-modal'];
